@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PasteBin Simple</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-8">
+                    <h1 class="text-2xl font-bold text-blue-400 cursor-pointer" onclick="showHome()">PasteBin</h1>
+                    
+                    <!-- Barre de recherche -->
+                    <div class="hidden md:flex items-center">
+                        <input type="text" id="navSearchCode" 
+                               placeholder="Entrer un code..."
+                               class="bg-gray-700 border border-gray-600 rounded-l px-4 py-2 w-64 focus:outline-none focus:border-blue-500"
+                               onkeypress="if(event.key==='Enter') viewPasteFromNav()">
+                        <button onclick="viewPasteFromNav()" 
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r transition">
+                            Voir
+                        </button>
+                    </div>
+                </div>
+                
+                <button onclick="showCreatePage()" 
+                        class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded transition">
+                    + Nouveau Paste
+                </button>
+            </div>
+            
+            <!-- Barre de recherche mobile -->
+            <div class="md:hidden pb-4">
+                <div class="flex items-center">
+                    <input type="text" id="navSearchCodeMobile" 
+                           placeholder="Entrer un code..."
+                           class="bg-gray-700 border border-gray-600 rounded-l px-4 py-2 w-full focus:outline-none focus:border-blue-500"
+                           onkeypress="if(event.key==='Enter') viewPasteFromNavMobile()">
+                    <button onclick="viewPasteFromNavMobile()" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r transition">
+                        Voir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page d'accueil -->
+    <div id="homePage" class="container mx-auto px-4 py-12 max-w-4xl">
+        <div class="text-center">
+            <h2 class="text-5xl font-bold mb-6 text-blue-400">Bienvenue sur PasteBin</h2>
+            <p class="text-xl text-gray-400 mb-8">Partagez vos textes simplement et rapidement</p>
+            
+            <div class="grid md:grid-cols-2 gap-6 mt-12">
+                <div class="bg-gray-800 rounded-lg p-8 hover:bg-gray-750 transition cursor-pointer" onclick="showCreatePage()">
+                    <div class="text-4xl mb-4">📝</div>
+                    <h3 class="text-2xl font-semibold mb-3 text-green-400">Créer un paste</h3>
+                    <p class="text-gray-400">Créez un nouveau paste avec votre code personnalisé</p>
+                </div>
+                
+                <div class="bg-gray-800 rounded-lg p-8 hover:bg-gray-750 transition">
+                    <div class="text-4xl mb-4">🔍</div>
+                    <h3 class="text-2xl font-semibold mb-3 text-blue-400">Chercher un paste</h3>
+                    <p class="text-gray-400">Utilisez la barre de recherche en haut pour trouver un paste</p>
+                </div>
+            </div>
+            
+            <div class="mt-12 bg-gray-800 rounded-lg p-6">
+                <h3 class="text-xl font-semibold mb-4 text-blue-300">Fonctionnalités</h3>
+                <div class="grid md:grid-cols-3 gap-4 text-sm text-gray-300">
+                    <div>
+                        <span class="text-green-400 font-semibold">✓</span> Codes URL personnalisés
+                    </div>
+                    <div>
+                        <span class="text-green-400 font-semibold">✓</span> Stockage sécurisé
+                    </div>
+                    <div>
+                        <span class="text-green-400 font-semibold">✓</span> Partage facile
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page de création -->
+    <div id="createPage" class="container mx-auto px-4 py-8 max-w-4xl hidden">
+        <div class="bg-gray-800 rounded-lg p-6 shadow-lg">
+            <h2 class="text-3xl font-bold mb-6 text-green-400">Créer un nouveau paste</h2>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Code URL personnalisé</label>
+                <input type="text" id="customCode" 
+                       class="w-full bg-gray-700 border border-gray-600 rounded px-4 py-2 focus:outline-none focus:border-blue-500"
+                       placeholder="mon-code-unique">
+                <p class="text-xs text-gray-400 mt-1">Utilisez uniquement des lettres, chiffres, tirets et underscores</p>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Contenu</label>
+                <textarea id="pasteContent" rows="15"
+                          class="w-full bg-gray-700 border border-gray-600 rounded px-4 py-2 focus:outline-none focus:border-blue-500 font-mono text-sm"
+                          placeholder="Collez votre texte ici..."></textarea>
+            </div>
+            
+            <button onclick="createPaste()" 
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded transition">
+                Créer le paste
+            </button>
+            
+            <div id="createResult" class="mt-4 hidden">
+                <div class="bg-green-900 border border-green-700 rounded p-4">
+                    <p class="font-semibold mb-2">✓ Paste créé avec succès !</p>
+                    <p class="text-sm mb-2">URL : <a id="pasteUrl" href="#" class="text-blue-400 underline break-all" target="_blank"></a></p>
+                    <p class="text-xs text-gray-400">Fichier créé : <span id="fileName" class="font-mono"></span></p>
+                    <button onclick="copyUrl()" class="mt-3 bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
+                        Copier l'URL
+                    </button>
+                </div>
+            </div>
+            
+            <div id="createError" class="mt-4 hidden">
+                <div class="bg-red-900 border border-red-700 rounded p-4">
+                    <p id="errorMessage" class="text-sm"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page de visualisation -->
+    <div id="viewPage" class="container mx-auto px-4 py-8 max-w-4xl hidden">
+        <div class="bg-gray-800 rounded-lg p-6 shadow-lg">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-blue-400">Paste : <span id="pasteCodeTitle" class="font-mono"></span></h2>
+                <button onclick="copyContent()" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">
+                    📋 Copier
+                </button>
+            </div>
+            
+            <div id="viewResult">
+                <pre id="pasteDisplay" class="bg-gray-900 rounded p-6 overflow-x-auto text-sm whitespace-pre-wrap border border-gray-700"></pre>
+            </div>
+            
+            <div id="viewError" class="hidden">
+                <div class="bg-red-900 border border-red-700 rounded p-4">
+                    <p id="viewErrorMessage" class="text-sm"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        let currentPasteUrl = '';
+        document.getElementById('createResult').classList.remove('hidden');
+
+        function sanitizeCode(code) {
+            return code.trim().replace(/[^a-zA-Z0-9_-]/g, '');
+        }
+
+        function showHome() {
+            document.getElementById('homePage').classList.remove('hidden');
+            document.getElementById('createPage').classList.add('hidden');
+            document.getElementById('viewPage').classList.add('hidden');
+            window.history.pushState({}, '', window.location.pathname);
+        }
+
+        function showCreatePage() {
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('createPage').classList.remove('hidden');
+            document.getElementById('viewPage').classList.add('hidden');
+            document.getElementById('createResult').classList.add('hidden');
+            document.getElementById('createError').classList.add('hidden');
+        }
+
+        function showViewPage() {
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('createPage').classList.add('hidden');
+            document.getElementById('viewPage').classList.remove('hidden');
+        }
+
+        async function createPaste() {
+            const code = sanitizeCode(document.getElementById('customCode').value);
+            const content = document.getElementById('pasteContent').value;
+            
+            document.getElementById('createResult').classList.add('hidden');
+            document.getElementById('createError').classList.add('hidden');
+            
+            if (!code) {
+                showError('Veuillez entrer un code URL');
+                return;
+            }
+            
+            if (!content) {
+                showError('Veuillez entrer du contenu');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/paste`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code, content })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const url = `${window.location.origin}?paste=${code}`;
+                    currentPasteUrl = url;
+                    document.getElementById('pasteUrl').href = url;
+                    document.getElementById('pasteUrl').textContent = url;
+                    document.getElementById('fileName').textContent = `${code}.txt`;
+                    window.location.href = `page.html?paste=${code}`;
+                    
+                    document.getElementById('customCode').value = '';
+                    document.getElementById('pasteContent').value = '';
+                } else {
+                    showError(data.error || 'Erreur lors de la création');
+                }
+            } catch (error) {
+                showError('Erreur de connexion au serveur. Assurez-vous que le serveur est lancé.');
+            }
+        }
+
+        async function viewPaste(code) {
+            showViewPage();
+            document.getElementById('viewError').classList.add('hidden');
+            document.getElementById('pasteCodeTitle').textContent = code;
+            
+            try {
+                const response = await fetch(`${API_URL}/paste/${code}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('pasteDisplay').textContent = data.content;
+                    document.getElementById('viewResult').classList.remove('hidden');
+                } else {
+                    document.getElementById('viewResult').classList.add('hidden');
+                    showViewError(data.error || 'Paste non trouvé');
+                }
+            } catch (error) {
+                document.getElementById('viewResult').classList.add('hidden');
+                showViewError('Erreur de connexion au serveur');
+            }
+        }
+
+        function viewPasteFromNav() {
+            const code = sanitizeCode(document.getElementById('navSearchCode').value);
+            if (code) {
+                window.history.pushState({}, '', `?paste=${code}`);
+                viewPaste(code);
+                document.getElementById('navSearchCode').value = '';
+            }
+        }
+
+        function viewPasteFromNavMobile() {
+            const code = sanitizeCode(document.getElementById('navSearchCodeMobile').value);
+            if (code) {
+                window.history.pushState({}, '', `?paste=${code}`);
+                viewPaste(code);
+                document.getElementById('navSearchCodeMobile').value = '';
+            }
+        }
+
+        function copyContent() {
+            const content = document.getElementById('pasteDisplay').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                alert('✓ Contenu copié dans le presse-papiers !');
+            });
+        }
+
+        function copyUrl() {
+            navigator.clipboard.writeText(currentPasteUrl).then(() => {
+                alert('✓ URL copiée dans le presse-papiers !');
+            });
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('createError').classList.remove('hidden');
+        }
+
+        function showViewError(message) {
+            document.getElementById('viewErrorMessage').textContent = message;
+            document.getElementById('viewError').classList.remove('hidden');
+        }
+
+        // Charger automatiquement un paste depuis l'URL
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pasteCode = urlParams.get('paste');
+            
+            if (pasteCode) {
+                viewPaste(pasteCode);
+            }
+        });
+    </script>
+</body>
+</html>
